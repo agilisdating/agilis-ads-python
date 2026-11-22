@@ -418,6 +418,31 @@ def test_events_preview_multipart(client: Agilis, api: FakeApi) -> None:
     assert file_parts(request) == [("image", "image.png", "image/png", b"\x89PNG\r\n\x1a\nrest")]
 
 
+def test_events_preview_takes_every_publish_field(client: Agilis, api: FakeApi) -> None:
+    client.events.preview(
+        {
+            "title": "Salsa",
+            "venue_name": "Bar Salsa",
+            "address": "96 Charing Cross Road",
+            "city": "London",
+            "country_code": "GB",
+            "location": [51.5133, -0.13],
+            "starts_at": "2027-10-16T18:30:00Z",
+            "ends_at": "2027-10-16T23:00:00Z",
+            "url": "https://example.com/salsa",
+            "price_min": 12,
+            "price_max": 12,
+            "currency": "GBP",
+        }
+    )
+    fields = form_fields(api.last)
+    assert ("address", "96 Charing Cross Road") in fields
+    assert ("location[]", "51.5133") in fields
+    assert ("location[]", "-0.13") in fields
+    assert ("price_min", "12") in fields
+    assert ("currency", "GBP") in fields
+
+
 def test_events_edit_without_file_is_post_with_override(client: Agilis, api: FakeApi) -> None:
     client.events.edit(3104, {"title": "Thursday Comedy Club", "location": [51.5, -0.1]})
     request = api.last

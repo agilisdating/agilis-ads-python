@@ -4,6 +4,7 @@ All notable changes to this package are listed here. It follows [Semantic Versio
 
 ## 0.1.0 (unreleased)
 
+- `events.preview` takes every field of `events.publish` (all optional), so a preview can be checked exactly as the publish would be.
 - First release: the `Agilis` client with every operation of the Agilis Advertising REST API (categories, interests, Offers, Events, webhook endpoints and webhook events).
 - Typed parameters and responses (`agilis_ads.types`).
 - Automatic `Idempotency-Key` on Offer creation and Event publishing, kept across retries.

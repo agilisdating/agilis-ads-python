@@ -336,9 +336,22 @@ class EventConfig(TypedDict, total=False):
 
 
 class EventPreviewParams(TypedDict, total=False):
+    """The fields of ``events.publish``, all optional: a preview is checked as a publish is."""
+
     title: str
     description: str
     venue_name: str
+    address: str
+    city: str
+    country_code: str
+    location: List[float]
+    starts_at: str
+    ends_at: str
+    url: str
+    advertised_name: str
+    price_min: float
+    price_max: float
+    currency: str
     image: ImageInput
     crop: Crop
     environment: Literal["TEST", "LIVE"]
