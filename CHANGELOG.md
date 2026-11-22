@@ -2,7 +2,7 @@
 
 All notable changes to this package are listed here. It follows [Semantic Versioning](https://semver.org/).
 
-## 0.1.0 (unreleased)
+## 0.1.0 (22 November 2026)
 
 - `events.preview` takes every field of `events.publish` (all optional), so a preview can be checked exactly as the publish would be.
 - First release: the `Agilis` client with every operation of the Agilis Advertising REST API (categories, interests, Offers, Events, webhook endpoints and webhook events).
