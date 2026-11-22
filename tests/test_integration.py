@@ -17,8 +17,11 @@ import pytest
 
 from agilis_ads import Agilis, InvalidRequestError, response_meta
 
+from .images import gradient_png
+
 pytestmark = pytest.mark.integration
 
+# The Offer dry run uses the 1080x1080 sample image; the Event one a generated 1280x720 image.
 SAMPLE_PNG = Path(__file__).resolve().parent.parent / "examples" / "sample-offer.png"
 
 # Refusals that depend only on the Test organisation's own state, not on the SDK.
@@ -126,7 +129,7 @@ def test_event_publish_dry_run(client: Agilis) -> None:
                 "starts_at": iso(start),
                 "ends_at": iso(start + timedelta(hours=3)),
                 "url": "https://www.agilis.dating",
-                "image": SAMPLE_PNG,
+                "image": ("sdk-event.png", gradient_png()),  # Events need 1280x720 or more
                 "payment_method": "B",
             },
             dry_run=True,
