@@ -118,7 +118,7 @@ Each method takes path parameters as arguments and everything else as one dict, 
 | `client.events.list(params=None)` | `GET /events` |
 | `client.events.iter_all(params=None)` | every page of `GET /events` |
 | `client.events.get(event_id)` | `GET /events/{event_id}` |
-| `client.events.edit(event_id, params)` | `PATCH /events/{event_id}` |
+| `client.events.edit(event_id, params)` | `PATCH /events/{event_id}` (sent as `POST` with `X-HTTP-Method-Override: PATCH`) |
 | `client.events.delete(event_id, *, dry_run=False)` | `DELETE /events/{event_id}` |
 | `client.events.reschedule(event_id, params)` | `POST /events/{event_id}/reschedule` |
 | `client.events.cancel(event_id, *, dry_run=False)` | `POST /events/{event_id}/cancel` |
@@ -162,7 +162,7 @@ client.events.publish(
 )
 ```
 
-Lists are sent as repeated fields (`location[]`, `gender[]`, `interests[]`) and `crop` as `crop[x]`, `crop[y]` and `crop[w]`. When `events.edit` includes a new image it is sent as `POST` with `X-HTTP-Method-Override: PATCH`, as the API requires for uploads.
+Lists are sent as repeated fields (`location[]`, `gender[]`, `interests[]`) and `crop` as `crop[x]`, `crop[y]` and `crop[w]`. `events.edit` is always sent as a multipart `POST` with `X-HTTP-Method-Override: PATCH`, with or without a new image, so its fields always reach the API.
 
 ### Status and headers
 

@@ -418,12 +418,14 @@ def test_events_preview_multipart(client: Agilis, api: FakeApi) -> None:
     assert file_parts(request) == [("image", "image.png", "image/png", b"\x89PNG\r\n\x1a\nrest")]
 
 
-def test_events_edit_without_file_is_patch(client: Agilis, api: FakeApi) -> None:
+def test_events_edit_without_file_is_post_with_override(client: Agilis, api: FakeApi) -> None:
     client.events.edit(3104, {"title": "Thursday Comedy Club", "location": [51.5, -0.1]})
     request = api.last
-    assert request.method == "PATCH"
+    assert request.method == "POST"
     assert request.url.path == "/events/3104"
-    assert "x-http-method-override" not in request.headers
+    assert request.headers["x-http-method-override"] == "PATCH"
+    assert request.headers["content-type"].startswith("multipart/form-data; boundary=")
+    assert file_parts(request) == []
     assert form_fields(request) == [
         ("title", "Thursday Comedy Club"),
         ("location[]", "51.5"),

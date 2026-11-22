@@ -260,16 +260,16 @@ class Events(_Resource):
     def edit(self, event_id: Id, params: EventEditParams) -> EventEditResult:
         """``PATCH /events/{event_id}``: change a published Event (multipart).
 
-        With a new ``image`` it is sent as ``POST`` with ``X-HTTP-Method-Override: PATCH``.
+        Always sent as a multipart ``POST`` with ``X-HTTP-Method-Override: PATCH``,
+        with or without a new ``image``, so the fields reach the API in every case.
         """
         path = self._client._path("/events/{}", event_id)
-        parts = form_parts(params)
-        if params.get("image") is not None:
-            result = self._client._request(
-                "POST", path, multipart=parts, headers={"X-HTTP-Method-Override": "PATCH"}
-            )
-        else:
-            result = self._client._request("PATCH", path, multipart=parts)
+        result = self._client._request(
+            "POST",
+            path,
+            multipart=form_parts(params),
+            headers={"X-HTTP-Method-Override": "PATCH"},
+        )
         return cast(EventEditResult, result)
 
     def delete(self, event_id: Id, *, dry_run: bool = False) -> ReturnCodeResult:

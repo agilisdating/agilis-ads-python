@@ -10,3 +10,4 @@ All notable changes to this package are listed here. It follows [Semantic Versio
 - Retries with `Retry-After` and exponential backoff.
 - Cursor pagination helpers (`iter_all`).
 - Webhook signature verification (`construct_event`).
+- `events.edit` is always sent as a multipart `POST` with `X-HTTP-Method-Override: PATCH`.

@@ -63,7 +63,7 @@ def test_delete_retried_on_5xx(client: Agilis, api: FakeApi) -> None:
                 {"start_datetime": "a", "end_datetime": "b", "location": [1, 2], "radius": 5}
             ),
         ),
-        ("edit patch", lambda c: c.events.edit(3104, {"title": "x"})),
+        ("edit", lambda c: c.events.edit(3104, {"title": "x"})),
         ("edit post", lambda c: c.events.edit(3104, {"image": b"\x89PNG\r\n\x1a\n"})),
         ("endpoint update", lambda c: c.webhook_endpoints.update("we_1", {"status": "enabled"})),
     ],
