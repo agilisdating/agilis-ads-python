@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Lint
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Type check
+        run: mypy
+
+      - name: Tests
+        run: pytest -v
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Check the wheel installs
+        run: |
+          python -m venv /tmp/wheel-check
+          /tmp/wheel-check/bin/pip install dist/*.whl
+          /tmp/wheel-check/bin/python -c "import agilis_ads; print(agilis_ads.__version__)"
+
+  integration:
+    name: Integration (Test mode)
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      AGILIS_TEST_API_KEY: ${{ secrets.AGILIS_TEST_API_KEY }}
+    steps:
+      - name: Check for a Test-mode key
+        id: key
+        run: |
+          if [ -z "$AGILIS_TEST_API_KEY" ]; then
+            echo "AGILIS_TEST_API_KEY is not set: skipping the integration run."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          case "$AGILIS_TEST_API_KEY" in
+            pk_test_*) echo "present=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "AGILIS_TEST_API_KEY must be a Test-mode (pk_test_) key; refusing to run."; exit 1 ;;
+          esac
+
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.present == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.key.outputs.present == 'true'
+        with:
+          python-version: "3.13"
+
+      - name: Install
+        if: steps.key.outputs.present == 'true'
+        run: python -m pip install -e ".[dev]"
+
+      - name: Integration tests
+        if: steps.key.outputs.present == 'true'
+        run: pytest -v -m integration -rs
